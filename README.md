@@ -38,18 +38,20 @@ The code times how long each container takes for both operations combined.
 
 ---
 
+
+
 ## Why Does `std::vector` Often Outperform `std::list`?
 
-On paper, one might expect:
+Theoritical analysis suggests the following time complexities: 
 - `std::vector` insertions to be **O(N)** (element shifting),
 - `std::list` insertions to be **O(1)** (just re-link pointers).
 
-However, in practice, **`std::vector` can be faster**, sometimes significantly, because of:
+However, when we take a look at empirical data, **`std::vector` can be faster**, sometimes significantly, because of:
 
-1. **Contiguous Memory / Cache Locality**  
+1. **Contiguous Memory / Cache Lines**  
    `std::vector` stores its elements contiguously. Modern CPUs fetch data in cache lines (64 bytes on many systems). Sequential access and predictable memory patterns allow CPUs to preload data efficiently, minimizing cache misses.
 
-2. **Branch Prediction & Prefetching**  
+2. **Prefetching**  
    With contiguous memory, CPU hardware prefetchers can anticipate future memory accesses. Linked lists, by contrast, require pointer chasing to traverse nodes scattered around the heap, causing more cache misses.
 
 3. **Fewer Allocations**  
@@ -68,3 +70,15 @@ However, in practice, **`std::vector` can be faster**, sometimes significantly, 
    ```bash
    git clone https://github.com/zgrigoryan/vector-vs-list-performance.git
    cd CompareVectorList
+   ```
+
+2. **Compile**:
+   ```bash
+   g++ -std=c++17 -O2 main.cpp -o main
+   ```
+
+3. **Run** by simply using the command:
+   ```bash
+   ./main
+   ```
+
