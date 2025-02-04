@@ -64,7 +64,7 @@ However, when we take a look at empirical data, **`std::vector` can be faster**,
 
 ---
 
-## Build Instructions
+## Build & Run
 
 1. **Clone** this repository:
    ```bash
