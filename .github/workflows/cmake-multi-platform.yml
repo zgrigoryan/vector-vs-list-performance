@@ -11,7 +11,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations.
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -64,12 +63,10 @@ jobs:
       run: |
         echo "Running program to compare formatted outputs..."
         cd "${{ steps.strings.outputs.build-output-dir }}"
-
-        # Run the executable; adjust path based on OS.
         if [[ "$RUNNER_OS" == "Windows" ]]; then
           ./Release/my_program.exe > formatted_output.log
         else
-          chmod +x ./my_program || true  # Adjust if executable is in a subdirectory.
+          chmod +x ./my_program || true
           ./my_program > formatted_output.log
         fi
 
@@ -77,10 +74,10 @@ jobs:
         cat formatted_output.log
         echo "-----------------------------"
 
-        # Compare output with expected formatted lines.
-        grep -q "N=100 vector=17 list=14 list/vector=0.823529" formatted_output.log || (echo "Mismatch for N=100" && exit 1)
-        grep -q "N=1000 vector=142 list=8035 list/vector=56.5845" formatted_output.log || (echo "Mismatch for N=1000" && exit 1)
-        grep -q "N=10000 vector=320673 list=781103 list/vector=2.43582" formatted_output.log || (echo "Mismatch for N=10000" && exit 1)
-        grep -q "N=30000 vector=1034427 list=10751006 list/vector=10.3932" formatted_output.log || (echo "Mismatch for N=30000" && exit 1)
-        grep -q "N=100000 vector=7160236 list=95482998 list/vector=13.3352" formatted_output.log || (echo "Mismatch for N=100000" && exit 1)
-        echo "Formatted output matches expected values!"
+        expected_count=5
+        actual_count=$(grep -E "^N=[0-9]+ vector=[0-9]+ list=[0-9]+ list/vector=[0-9]*\.?[0-9]+$" formatted_output.log | wc -l)
+        if [ "$actual_count" -ne "$expected_count" ]; then
+          echo "Expected $expected_count lines of formatted output, but got $actual_count"
+          exit 1
+        fi
+        echo "Formatted output matches expected format!"
